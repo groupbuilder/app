@@ -33,15 +33,17 @@
         [sender setBackgroundImage:[UIImage imageNamed:@"cardback"]
                           forState:UIControlStateNormal];
         [sender setTitle:@"" forState:UIControlStateNormal];
+        self.flipsCount++;
     } else {
         [sender setBackgroundImage:[UIImage imageNamed:@"cardfront"]
                           forState:UIControlStateNormal];
         Card *randomCard = [self.deck drawRandomCard];
-        //[sender setTitle:@"A♣️" forState:UIControlStateNormal];
-        NSLog(@"Choose Card %@", randomCard.contents);
-        [sender setTitle:randomCard.contents forState:UIControlStateNormal];
+        if (randomCard) {
+            NSLog(@"Choose Card %@", randomCard.contents);
+            [sender setTitle:randomCard.contents forState:UIControlStateNormal];
+            self.flipsCount++;
+        }
     }
-    self.flipsCount++;
 }
 
 
