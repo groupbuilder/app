@@ -44,7 +44,6 @@
     NSLog(@"Flips %d times", self.flipsCount);
 }
 - (IBAction)touchCardButton:(UIButton *)sender {
-<<<<<<< HEAD
     long chooseButtonIndex = [self.cardButtons indexOfObject:sender];
     [self.game chooseCardAtIndex:chooseButtonIndex];
     [self updateUI];
