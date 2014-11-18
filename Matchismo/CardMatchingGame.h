@@ -26,6 +26,8 @@
 @property (nonatomic, readonly) NSInteger score;
 @property (nonatomic, readonly) BOOL isBeginning;
 @property (nonatomic) BOOL twoMatchGame;
+@property (nonatomic, readonly) NSString *status;
+@property (nonatomic, readonly) NSMutableArray *history;
 
 @end
 #endif

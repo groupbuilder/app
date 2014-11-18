@@ -9,10 +9,13 @@
 #import "ViewController.h"
 #import "Deck.h"
 #import "PlayingCardDeck.h"
+#import "SetPlayingCard.h"
 #import "CardMatchingGame.h"
+#import "TextViewController.h"
 
 @interface ViewController ()
 @property (weak, nonatomic) IBOutlet UILabel *flipsLabel;
+@property (weak, nonatomic) IBOutlet UILabel *statusLabel;
 @property (nonatomic) int flipsCount;
 @property (strong, nonatomic) Deck *deck;
 @property (strong, nonatomic) CardMatchingGame *game;
@@ -57,9 +60,10 @@
         [cardButton setBackgroundImage:[self backgroundImageForCard:card]
                               forState:UIControlStateNormal];
         cardButton.enabled = !card.isMatched;
-        self.scoreLabel.text = [NSString stringWithFormat:@"Score: %ld", (long)self.game.score];
-        self.gameSwitch.enabled = self.game.isBeginning;
     }
+    self.scoreLabel.text = [NSString stringWithFormat:@"Score: %ld", (long)self.game.score];
+    self.gameSwitch.enabled = self.game.isBeginning;
+    self.statusLabel.text = self.game.status;
 }
 - (NSString *) titleForCard:(Card *) card {
     return card.isChosen ? card.contents : @"";
@@ -74,5 +78,10 @@
 - (IBAction)gameSwitch:(UISwitch *)sender {
     self.game.twoMatchGame = [sender isOn] ? YES : NO;
 }
-
+- (void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    if ([segue.identifier isEqualToString:@"Game History"]) {
+        TextViewController *tvc = (TextViewController *)segue.destinationViewController;
+        tvc.history = self.game.history;
+    }
+}
 @end
