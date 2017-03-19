@@ -8,8 +8,47 @@
 
 import UIKit
 
-class ViewController: UIViewController {
-
+class CalculatorViewController: UIViewController {
+    
+    private var graphFunctions: Dictionary<String, (Double) -> Double> = [
+        "√": sqrt,
+        "cos": cos,
+        "sin": sin,
+        "x^2": {$0 * $0},
+        "x^3": {$0 * $0 * $0},
+        "∛": {pow($0, 1.0/3)},
+    ]
+    
+    private func getGraphFunctions() -> String? {
+        for i in 0..<(brain.program.count - 1) {
+            if (brain.program[i] as? String) == nil || (brain.program[i + 1] as? String) == nil {
+                continue
+            }
+            if (brain.program[i] as! String) == "M" && graphFunctions[brain.program[i + 1] as! String] != nil {
+                return brain.program[i + 1] as? String
+            }
+        }
+        return nil
+    }
+    
+    
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let f = getGraphFunctions()
+        if f != nil && segue.identifier == "Show Graph" {
+            let title = f! + "(M)"
+            if let dvc = segue.destination as? UINavigationController {
+                let vc = dvc.visibleViewController as? GraphViewController
+                vc?.title = title
+                vc?.model.function = graphFunctions[f!]!
+            }
+            if let dvc = segue.destination as? GraphViewController {
+                dvc.title = title
+                dvc.model.function = graphFunctions[f!]!
+            }
+        }
+    }
+    
     @IBOutlet weak var display: UILabel!
     
     @IBOutlet weak var history: UILabel!
@@ -96,7 +135,7 @@ class ViewController: UIViewController {
         } else {
             savedProgram = brain.program
             if (savedProgram?.count)! > 0 {
-                savedProgram!.popLast()
+                _ = savedProgram!.popLast()
             }
             brain.program = savedProgram!
             displayValue = brain.result
