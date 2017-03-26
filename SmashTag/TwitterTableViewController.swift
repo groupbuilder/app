@@ -8,10 +8,13 @@
 
 import UIKit
 import Twitter
+import CoreData
 
-class TwitterTableViewController: UITableViewController {
+class TwitterTableViewController: UITableViewController, UITextFieldDelegate {
     
-    var tweets = [Array<Tweet>]() {
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+
+    var tweets = [Array<Twitter.Tweet>]() {
         didSet {
             tableView.reloadData()
         }
@@ -39,6 +42,20 @@ class TwitterTableViewController: UITableViewController {
         }
     }
     
+    @IBOutlet weak var searchTextField: UITextField! {
+        didSet {
+            searchTextField.delegate = self
+            searchTextField.text = searchText
+        }
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        lastTwitterRequest = nil
+        searchText = textField.text?.lowercased() ?? "#stanford"
+        return true
+    }
+    
     private var twitterRequest: Twitter.Request? {
         if lastTwitterRequest == nil {
             if let query = searchText, !query.isEmpty {
@@ -58,6 +75,7 @@ class TwitterTableViewController: UITableViewController {
                     if request == weakSelf?.lastTwitterRequest {
                         if !newTweets.isEmpty {
                             weakSelf?.tweets.insert(newTweets, at: 0)
+                            weakSelf?.updateDatabase(newTweets)
                         }
                     }
                     weakSelf?.refreshControl?.endRefreshing()
@@ -68,10 +86,20 @@ class TwitterTableViewController: UITableViewController {
         }
     }
     
+    func updateDatabase(_ newTweets: [Twitter.Tweet]) {
+        context.perform {
+            for tweet in newTweets {
+                _ = Tweet.tweetWithInfo(self.searchText!, tweet, self.context)
+            }
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         tableView.estimatedRowHeight = tableView.rowHeight
         tableView.rowHeight = UITableViewAutomaticDimension
+        
         if searchText == nil {
             searchText = "#stanford"
         }

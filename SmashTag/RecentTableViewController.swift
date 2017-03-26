@@ -14,6 +14,8 @@ class RecentTableViewController: UITableViewController {
     
     private struct StoryBoard {
         static let SearchHistoryKey = "SearchHistoryKey"
+        static let RecentTableCell = "RecentTableCell"
+        static let CellSegue = "CellSegue"
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -50,11 +52,22 @@ class RecentTableViewController: UITableViewController {
 
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "RecentTableCell", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: StoryBoard.RecentTableCell, for: indexPath)
         cell.textLabel?.text = historySearches[indexPath.row]
         return cell
     }
 
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == StoryBoard.CellSegue {
+            if let dvc = segue.destination as? StatsTableViewController {
+                if let cell = sender as? UITableViewCell {
+                    dvc.query = cell.textLabel?.text
+                    dvc.managedContext = (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer.viewContext
+                }
+            }
+        }
+    }
+    
     /*
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
